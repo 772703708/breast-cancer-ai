@@ -205,7 +205,7 @@
                             Home</a></li>
                     <li><a href="{{ url_for('about') }}"
                             class="{% if request.endpoint == 'about' %}active{% endif %}"><i
-                                class="fas fa-clipboard-list"></i> Abaout</a></li>
+                                class="fas fa-clipboard-list"></i> About </a></li>
                     <li><a href="{{ url_for('contact') }}"
                             class="{% if request.endpoint == 'contact' %}active{% endif %}"><i
                                 class="fas fa-envelope"></i> Contact</a></li>
@@ -261,7 +261,7 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
         <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a>
-        <a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> Abaout</a>
+        <a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> About </a>
         <a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a>
         {% if not session.user_id %}
         <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Sign In</a>
@@ -321,7 +321,7 @@
                 <h3>Quick Links</h3>
                 <ul>
                     <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> Abaout</a></li>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> About </a></li>
                     <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
                     {% if session.user_id %}
                     <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
