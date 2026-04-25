@@ -1,0 +1,265 @@
+{% extends "admin_base.html" %}
+
+{% block title %}All Predictions | Admin Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filters-bar {
+        background: var(--surface-light);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 24px;
+        border: 1px solid var(--border-light);
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        flex: 1;
+        min-width: 150px;
+    }
+    
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 10px 12px;
+        background: var(--surface-alt-light);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        color: var(--text-light);
+        outline: none;
+    }
+    
+    .table-container {
+        background: var(--surface-light);
+        border-radius: 20px;
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .data-table th {
+        background: var(--surface-alt-light);
+        color: var(--text-muted-light);
+        font-weight: 600;
+    }
+    
+    .data-table tr:hover {
+        background: rgba(233, 30, 99, 0.03);
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .badge-malignant {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+    
+    .badge-benign {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+    }
+    
+    .badge-high {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+    
+    .badge-moderate {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+    }
+    
+    .badge-low {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+    }
+    
+    .export-btn {
+        padding: 10px 20px;
+        background: var(--surface-alt-light);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        color: var(--text-light);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .export-btn:hover {
+        background: var(--primary-pink);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .table-container {
+            overflow-x: auto;
+        }
+        .data-table {
+            min-width: 800px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-size: 1.8rem;">All Predictions</h1>
+        <p style="color: var(--text-muted-light);">View and manage all user predictions</p>
+    </div>
+    <button class="export-btn" onclick="exportToCSV()">
+        <i class="fas fa-download"></i> Export CSV
+    </button>
+</div>
+
+<div class="filters-bar">
+    <div class="filter-group">
+        <input type="text" id="searchInput" placeholder="Search by user or result..." onkeyup="filterTable()">
+    </div>
+    <div class="filter-group">
+        <select id="riskFilter" onchange="filterTable()">
+            <option value="all">All Risk Levels</option>
+            <option value="Very High Risk">Very High Risk</option>
+            <option value="High Risk">High Risk</option>
+            <option value="Moderate to High Risk">Moderate to High Risk</option>
+            <option value="Moderate Risk">Moderate Risk</option>
+            <option value="Low to Moderate Risk">Low to Moderate Risk</option>
+            <option value="Low Risk">Low Risk</option>
+            <option value="Very Low Risk">Very Low Risk</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <input type="date" id="dateFrom" onchange="filterTable()" placeholder="Date from">
+    </div>
+    <div class="filter-group">
+        <input type="date" id="dateTo" onchange="filterTable()" placeholder="Date to">
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="data-table" id="predictionsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Tumor Size</th>
+                <th>Result</th>
+                <th>Risk Level</th>
+                <th>Probability</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            {% for pred in predictions %}
+            <tr data-risk="{{ pred[12] }}" data-date="{{ pred[14][:10] if pred[14] else '' }}" data-search="{{ pred[15] }} {{ pred[16] }}">
+                <td>{{ pred[0] }}</td>
+                <td>{{ pred[15] or 'N/A' }}</td>
+                <td>{{ pred[16] or 'N/A' }}</td>
+                <td>{{ pred[2] or 'N/A' }}</td>
+                <td>{{ pred[5] or 'N/A' }} mm</td>
+                <td>
+                    {% if pred[11] == 1 %}
+                        <span class="badge badge-malignant">Malignant</span>
+                    {% else %}
+                        <span class="badge badge-benign">Benign</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if pred[12] == 'Very High Risk' %}
+                        <span class="badge badge-high">Very High</span>
+                    {% elif pred[12] == 'High Risk' %}
+                        <span class="badge badge-high">High</span>
+                    {% elif pred[12] == 'Moderate Risk' %}
+                        <span class="badge badge-moderate">Moderate</span>
+                    {% else %}
+                        <span class="badge badge-low">Low</span>
+                    {% endif %}
+                </td>
+                <td>{{ "%.1f"|format(pred[11] * 100) if pred[11] else "%.1f"|format((1 - pred[11]) * 100) }}%</td>
+                <td>{{ pred[14][:16] if pred[14] else 'N/A' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9" style="text-align: center; padding: 60px;">
+                    <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--text-muted-light);"></i>
+                    <h3 style="margin-top: 16px;">No predictions found</h3>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function filterTable() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const riskFilter = document.getElementById('riskFilter').value;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        rows.forEach(row => {
+            if (row.querySelector('td[colspan="9"]')) return;
+            
+            let show = true;
+            const searchData = row.getAttribute('data-search') || '';
+            const risk = row.getAttribute('data-risk') || '';
+            const rowDate = row.getAttribute('data-date') || '';
+            
+            if (searchTerm && !searchData.toLowerCase().includes(searchTerm)) show = false;
+            if (riskFilter !== 'all' && risk !== riskFilter) show = false;
+            if (dateFrom && rowDate < dateFrom) show = false;
+            if (dateTo && rowDate > dateTo) show = false;
+            
+            row.style.display = show ? '' : 'none';
+        });
+    }
+    
+    function exportToCSV() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        const csvData = [['ID', 'User', 'Email', 'Age', 'Tumor Size', 'Result', 'Risk Level', 'Probability', 'Date']];
+        
+        rows.forEach(row => {
+            if (row.querySelector('td[colspan="9"]')) return;
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 9) {
+                csvData.push([
+                    cells[0].innerText, cells[1].innerText, cells[2].innerText,
+                    cells[3].innerText, cells[4].innerText, cells[5].innerText,
+                    cells[6].innerText, cells[7].innerText, cells[8].innerText
+                ]);
+            }
+        });
+        
+        const csvContent = csvData.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'all_predictions.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+{% endblock %}

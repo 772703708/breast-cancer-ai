@@ -1,0 +1,196 @@
+<!-- markdownlint-disable -->
+{% extends "base.html" %}
+
+{% block title %}Prediction Result | BreastCancerAI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="result-card" style="border-top: 4px solid {{ risk_color }};">
+    <div class="result-icon" style="background: {{ risk_bg_color }}; color: {{ risk_color }};">
+        <i class="fas {{ risk_icon }}"></i>
+    </div>
+    
+    <div class="result-title" style="color: {{ risk_color }};">
+        {{ risk_level }}
+    </div>
+    
+    <div class="risk-description">
+        {% if risk_level == 'Very High Risk' %}
+            The AI model indicates a very high probability of malignant cells. Immediate medical attention is strongly recommended.
+        {% elif risk_level == 'High Risk' %}
+            The AI model indicates a high probability of malignant cells. Please consult a healthcare professional promptly.
+        {% elif risk_level == 'Moderate to High Risk' %}
+            The AI model indicates an elevated risk level. Medical follow-up and additional screening are recommended.
+        {% elif risk_level == 'Moderate Risk' %}
+            The AI model indicates a moderate risk level. Discuss these results with your healthcare provider.
+        {% elif risk_level == 'Low to Moderate Risk' %}
+            The AI model indicates a slightly elevated risk. Continue regular screening and healthy habits.
+        {% elif risk_level == 'Low Risk' %}
+            The AI model indicates a low probability of malignancy. Continue regular check-ups and self-examinations.
+        {% else %}
+            The AI model indicates a very low probability of malignancy. Maintain your healthy lifestyle and regular screenings.
+        {% endif %}
+    </div>
+    
+    <div class="probability-bar-container">
+        <div class="probability-label">
+            Probability of Malignancy: <strong>{{ "%.1f"|format(probability * 100) }}%</strong>
+        </div>
+        <div class="probability-bar">
+            <div class="probability-fill 
+                {% if probability >= 0.85 %}fill-very-high
+                {% elif probability >= 0.70 %}fill-high
+                {% elif probability >= 0.55 %}fill-moderate-high
+                {% elif probability >= 0.40 %}fill-moderate
+                {% elif probability >= 0.25 %}fill-low-moderate
+                {% elif probability >= 0.10 %}fill-low
+                {% else %}fill-very-low{% endif %}" 
+                style="width: {{ probability * 100 }}%;">
+                {{ "%.0f"|format(probability * 100) }}%
+            </div>
+        </div>
+        <div class="probability-value" style="color: {{ risk_color }};">
+            {{ "%.1f"|format((probability if prediction_result == 1 else 1 - probability) * 100) }}% Confidence
+        </div>
+    </div>
+    
+    <div class="info-grid">
+        <div class="info-item">
+            <i class="fas fa-microscope"></i>
+            <div class="label">AI Model</div>
+            <div class="value">Logistic Regression</div>
+        </div>
+        <div class="info-item">
+            <i class="fas fa-chart-line"></i>
+            <div class="label">ROC-AUC Score</div>
+            <div class="value">99.7%</div>
+        </div>
+        <div class="info-item">
+            <i class="fas fa-calendar-alt"></i>
+            <div class="label">Prediction Date</div>
+            <div class="value" id="currentDate"></div>
+        </div>
+    </div>
+    
+    <div class="info-grid" style="margin-top: 0;">
+        <div class="info-item">
+            <i class="fas fa-chart-simple"></i>
+            <div class="label">Risk Category</div>
+            <div class="value" style="color: {{ risk_color }};">{{ risk_level }}</div>
+        </div>
+        <div class="info-item">
+            <i class="fas fa-percent"></i>
+            <div class="label">Malignancy Probability</div>
+            <div class="value">{{ "%.1f"|format(probability * 100) }}%</div>
+        </div>
+        <div class="info-item">
+            <i class="fas fa-shield-alt"></i>
+            <div class="label">Benign Probability</div>
+            <div class="value">{{ "%.1f"|format((1 - probability) * 100) }}%</div>
+        </div>
+    </div>
+    
+    <div class="recommendations">
+        <h3><i class="fas fa-clinic-medical"></i> Personalized Recommendations</h3>
+        
+        {% if risk_level == 'Very High Risk' %}
+        <ul>
+            <li><i class="fas fa-ambulance"></i> Seek immediate medical attention</li>
+            <li><i class="fas fa-x-ray"></i> Request urgent diagnostic imaging</li>
+            <li><i class="fas fa-microscope"></i> Consider biopsy for definitive diagnosis</li>
+            <li><i class="fas fa-calendar-check"></i> Do not delay - early intervention improves outcomes</li>
+        </ul>
+        {% elif risk_level == 'High Risk' %}
+        <ul>
+            <li><i class="fas fa-stethoscope"></i> Schedule an appointment within 1-2 weeks</li>
+            <li><i class="fas fa-x-ray"></i> Request a mammogram and ultrasound</li>
+            <li><i class="fas fa-microscope"></i> Discuss biopsy options with your doctor</li>
+            <li><i class="fas fa-calendar-week"></i> Follow up regularly with your healthcare provider</li>
+        </ul>
+        {% elif risk_level == 'Moderate to High Risk' %}
+        <ul>
+            <li><i class="fas fa-calendar-alt"></i> Schedule a medical consultation within 1 month</li>
+            <li><i class="fas fa-x-ray"></i> Consider additional screening</li>
+            <li><i class="fas fa-apple-alt"></i> Adopt a healthy lifestyle to reduce risk factors</li>
+            <li><i class="fas fa-heartbeat"></i> Perform monthly breast self-examinations</li>
+        </ul>
+        {% elif risk_level == 'Moderate Risk' %}
+        <ul>
+            <li><i class="fas fa-calendar-week"></i> Discuss results with your doctor</li>
+            <li><i class="fas fa-x-ray"></i> Ensure regular mammogram screening</li>
+            <li><i class="fas fa-apple-alt"></i> Maintain a healthy diet</li>
+            <li><i class="fas fa-walking"></i> Exercise regularly</li>
+        </ul>
+        {% elif risk_level == 'Low to Moderate Risk' %}
+        <ul>
+            <li><i class="fas fa-calendar-week"></i> Continue regular health screenings</li>
+            <li><i class="fas fa-heartbeat"></i> Perform monthly breast self-examinations</li>
+            <li><i class="fas fa-apple-alt"></i> Maintain a healthy lifestyle</li>
+            <li><i class="fas fa-walking"></i> Stay physically active</li>
+        </ul>
+        {% elif risk_level == 'Low Risk' %}
+        <ul>
+            <li><i class="fas fa-calendar-week"></i> Continue regular monthly self-examinations</li>
+            <li><i class="fas fa-x-ray"></i> Schedule routine mammograms as recommended</li>
+            <li><i class="fas fa-apple-alt"></i> Maintain a healthy diet</li>
+            <li><i class="fas fa-walking"></i> Exercise regularly</li>
+        </ul>
+        {% else %}
+        <ul>
+            <li><i class="fas fa-calendar-week"></i> Continue regular monthly breast self-examinations</li>
+            <li><i class="fas fa-x-ray"></i> Follow recommended screening guidelines</li>
+            <li><i class="fas fa-apple-alt"></i> Maintain a healthy diet and active lifestyle</li>
+            <li><i class="fas fa-smile"></i> Excellent work maintaining your health!</li>
+        </ul>
+        {% endif %}
+    </div>
+    
+    <div class="action-buttons">
+        <a href="{{ url_for('predict_page') }}" class="primary-btn"><i class="fas fa-plus-circle"></i> New Prediction</a>
+        <a href="{{ url_for('dashboard') }}" class="secondary-btn"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{{ url_for('history') }}" class="secondary-btn"><i class="fas fa-history"></i> History</a>
+        <button onclick="window.print()" class="secondary-btn"><i class="fas fa-print"></i> Print</button>
+        <button onclick="shareResult()" class="secondary-btn"><i class="fas fa-share-alt"></i> Share</button>
+    </div>
+</div>
+
+<script>
+    var today = new Date();
+    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+    var dateElement = document.getElementById('currentDate');
+    if (dateElement) {
+        dateElement.textContent = today.toLocaleDateString('en-US', options);
+    }
+    
+    function shareResult() {
+        var probabilityValue = parseFloat("{{ probability * 100 }}").toFixed(1);
+        var riskLevelValue = "{{ risk_level }}";
+        var shareText = "My breast cancer risk assessment result: " + riskLevelValue + " with " + probabilityValue + "% probability.";
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Breast Cancer Risk Assessment',
+                text: shareText,
+                url: window.location.href
+            }).catch(function() {});
+        } else {
+            navigator.clipboard.writeText(shareText);
+            alert('Result copied to clipboard!');
+        }
+    
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var fillBar = document.querySelector('.probability-fill');
+        if (fillBar) {
+            var currentWidth = fillBar.style.width;
+            fillBar.style.width = '0%';
+            setTimeout(function() {
+                fillBar.style.width = currentWidth;
+            }, 100);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BreastCancerAI - Early Detection Saves Lives{% endblock %}</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e91e63'%3E%3Cpath d='M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Z'/%3E%3Cpath d='M12 6a4 4 0 1 0 4 4 4 4 0 0 0-4-4Zm0 6a2 2 0 1 1 2-2 2 2 0 0 1-2 2Z'/%3E%3C/svg%3E">
+
+    {% block extra_css %}{% endblock %}
+    <style>
+        .flash-message {
+            background: var(--surface-light);
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash-success {
+            border-left: 4px solid #10b981;
+        }
+
+        .flash-danger {
+            border-left: 4px solid #ef4444;
+        }
+
+        .flash-warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .flash-info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* User Dropdown Styles */
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-menu-btn {
+            background: var(--surface-alt-light);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu-btn:hover {
+            background: var(--surface-light);
+            border-color: var(--primary-pink);
+        }
+
+        .user-menu-btn i:first-child {
+            color: var(--primary-pink);
+            font-size: 1.2rem;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: var(--surface-light);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 8px;
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: var(--text-secondary-light);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .user-dropdown a i {
+            width: 20px;
+            font-size: 1rem;
+        }
+
+        .user-dropdown a:hover {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+        }
+
+        .user-dropdown hr {
+            margin: 8px;
+            border-color: var(--border-light);
+        }
+
+        /* Login Button */
+        .login-btn {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+        }
+
+        /* Header Icon Button */
+        .header-icon-btn {
+            background: var(--surface-alt-light);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .header-icon-btn:hover {
+            background: var(--primary-pink);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .user-menu-btn span {
+                display: none;
+            }
+
+            .user-menu-btn {
+                padding: 8px 12px;
+            }
+
+            .login-btn span {
+                display: none;
+            }
+
+            .login-btn {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-box">
+                <div class="logo-circle">
+                    <i class="fas fa-ribbon"></i>
+                </div>
+                <div>
+                    <div class="brand-title">BreastCancer<span style="color: var(--primary-pink);">AI</span></div>
+                    <div class="brand-sub">Early Detection Saves Lives</div>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('index') }}"
+                            class="{% if request.endpoint == 'index' %}active{% endif %}"><i class="fas fa-home"></i>
+                            Home</a></li>
+                    <li><a href="{{ url_for('about') }}"
+                            class="{% if request.endpoint == 'about' %}active{% endif %}"><i
+                                class="fas fa-clipboard-list"></i> Abaout</a></li>
+                    <li><a href="{{ url_for('contact') }}"
+                            class="{% if request.endpoint == 'contact' %}active{% endif %}"><i
+                                class="fas fa-envelope"></i> Contact</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                {% if session.user_id %}
+                <div class="user-menu">
+                    <button class="user-menu-btn" id="userMenuBtn">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ session.username[:15] }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('predict_page') }}">
+                            <i class="fas fa-chart-line"></i>
+                            <span>New Prediction</span>
+                        </a>
+                        <a href="{{ url_for('history') }}">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </a>
+                        <hr>
+                        <a href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign In</span>
+                </a>
+                {% endif %}
+
+                <button class="header-icon-btn" id="themeToggle">
+                    <i class="fas fa-sun"></i>
+                </button>
+            </div>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a>
+        <a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> Abaout</a>
+        <a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a>
+        {% if not session.user_id %}
+        <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Sign In</a>
+        {% else %}
+        <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="{{ url_for('predict_page') }}"><i class="fas fa-chart-line"></i> New Prediction</a>
+        <a href="{{ url_for('history') }}"><i class="fas fa-history"></i> History</a>
+        <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        {% endif %}
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div style="max-width: 1400px; margin: 20px auto 0; padding: 0 40px;">
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">
+            <i
+                class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2><i class="fas fa-ribbon"></i> BreastCancer<span style="color: var(--primary-pink);">AI</span></h2>
+                <p class="footer-tagline">Early Detection Saves Lives</p>
+                <p class="footer-description">
+                    An intelligent breast cancer risk prediction system using Machine Learning and accessible health
+                    data.
+                    Supporting early awareness and preventive medical action.
+                </p>
+            </div>
+
+            <div class="footer-social">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="twitter"><i class="fab fa-x-twitter"></i></a>
+                    <a href="#" class="snapchat"><i class="fab fa-snapchat-ghost"></i></a>
+                    <a href="#" class="tiktok"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> Abaout</a></li>
+                    <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
+                    {% if session.user_id %}
+                    <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('predict_page') }}"><i class="fas fa-chart-line"></i> New Prediction</a>
+                    </li>
+                    <li><a href="{{ url_for('history') }}"><i class="fas fa-history"></i> History</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Sign In</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 BreastCancerAI - Machine Learning Based Breast Cancer Prediction System. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM fully loaded');
+
+            // Theme Toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const htmlElement = document.documentElement;
+
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            htmlElement.setAttribute('data-theme', savedTheme);
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function () {
+                    const currentTheme = htmlElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    htmlElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            }
+
+            // Mobile Menu
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function () {
+                    mobileMenu.classList.toggle('active');
+                });
+
+                const mobileLinks = mobileMenu.querySelectorAll('a');
+                mobileLinks.forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        mobileMenu.classList.remove('active');
+                    });
+                });
+            }
+
+            // User Dropdown - Fixed version
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+
+            if (userMenuBtn && userDropdown) {
+                console.log('User menu elements found, adding event listeners');
+
+                // Remove any existing event listeners by cloning and replacing
+                var newUserMenuBtn = userMenuBtn.cloneNode(true);
+                userMenuBtn.parentNode.replaceChild(newUserMenuBtn, userMenuBtn);
+
+                var newUserDropdown = userDropdown.cloneNode(true);
+                userDropdown.parentNode.replaceChild(newUserDropdown, userDropdown);
+
+                // Get the new references
+                const finalUserBtn = document.getElementById('userMenuBtn');
+                const finalUserDropdown = document.getElementById('userDropdown');
+
+                // Add click event to button
+                finalUserBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    if (finalUserDropdown.classList.contains('show')) {
+                        finalUserDropdown.classList.remove('show');
+                    } else {
+                        finalUserDropdown.classList.add('show');
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (finalUserBtn && !finalUserBtn.contains(e.target)) {
+                        finalUserDropdown.classList.remove('show');
+                    }
+                });
+
+                // Prevent dropdown from closing when clicking inside
+                finalUserDropdown.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            } else {
+                console.log('User menu elements NOT found');
+            }
+
+            // Auto hide flash messages after 4 seconds
+            setTimeout(function () {
+                const flashMessages = document.querySelectorAll('.flash-message');
+                flashMessages.forEach(function (msg) {
+                    msg.style.transition = 'opacity 0.5s ease';
+                    msg.style.opacity = '0';
+                    setTimeout(function () {
+                        if (msg.parentNode) msg.remove();
+                    }, 500);
+                });
+            }, 4000);
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

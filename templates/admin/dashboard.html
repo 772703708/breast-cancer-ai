@@ -1,0 +1,291 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Dashboard | Admin Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+    
+    .stat-card {
+        background: var(--surface-light);
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(233, 30, 99, 0.1);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-pink);
+        font-size: 1.3rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+    
+    .stat-label {
+        color: var(--text-muted-light);
+        font-size: 0.85rem;
+    }
+    
+    .chart-container {
+        background: var(--surface-light);
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid var(--border-light);
+        margin-bottom: 32px;
+    }
+    
+    .chart-title {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .recent-table {
+        background: var(--surface-light);
+        border-radius: 20px;
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+    }
+    
+    .recent-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .recent-table th,
+    .recent-table td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .recent-table th {
+        background: var(--surface-alt-light);
+        color: var(--text-muted-light);
+        font-weight: 600;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+    }
+    
+    .badge-warning {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+    }
+    
+    .badge-danger {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+    
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 1.8rem;">Dashboard</h1>
+    <p style="color: var(--text-muted-light);">Welcome back, Administrator</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="stat-value">{{ total_users|default(0) }}</div>
+        <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        </div>
+        <div class="stat-value">{{ total_predictions|default(0) }}</div>
+        <div class="stat-label">Total Predictions</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+        </div>
+        <div class="stat-value">{{ unread_messages|default(0) }}</div>
+        <div class="stat-label">Unread Messages</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
+        </div>
+        <div class="stat-value">{{ avg_risk|default(0) }}%</div>
+        <div class="stat-label">Average Risk Score</div>
+    </div>
+</div>
+
+<div class="chart-container">
+    <div class="chart-title">
+        <i class="fas fa-chart-line" style="color: var(--primary-pink);"></i>
+        <span>Prediction Trends (Last 7 Days)</span>
+    </div>
+    <canvas id="trendsChart" height="100"></canvas>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-robot"></i></div>
+        </div>
+        <div class="stat-value">{{ model_accuracy|default(97.4) }}%</div>
+        <div class="stat-label">Model Accuracy</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-microscope"></i></div>
+        </div>
+        <div class="stat-value">{{ malignant_count|default(0) }}</div>
+        <div class="stat-label">Malignant Cases</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
+        </div>
+        <div class="stat-value">{{ benign_count|default(0) }}</div>
+        <div class="stat-label">Benign Cases</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+        </div>
+        <div class="stat-value">{{ active_today|default(0) }}</div>
+        <div class="stat-label">Active Today</div>
+    </div>
+</div>
+
+<div class="recent-table">
+    <div style="padding: 20px; border-bottom: 1px solid var(--border-light);">
+        <h3><i class="fas fa-history"></i> Recent Predictions</h3>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Age</th>
+                <th>Tumor Size</th>
+                <th>Result</th>
+                <th>Risk Level</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pred in recent_predictions|default([]) %}
+            <tr>
+                <td>{{ pred[0]|default('User') }}</td>
+                <td>{{ pred[1]|default('N/A') }}</td>
+                <td>{{ pred[2]|default('N/A') }} mm</td>
+                <td>
+                    {% if pred[3] == 1 %}
+                        <span class="badge badge-danger">Malignant</span>
+                    {% else %}
+                        <span class="badge badge-success">Benign</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if pred[4] == 'High Risk' %}
+                        <span class="badge badge-danger">High</span>
+                    {% elif pred[4] == 'Moderate Risk' %}
+                        <span class="badge badge-warning">Moderate</span>
+                    {% else %}
+                        <span class="badge badge-success">Low</span>
+                    {% endif %}
+                </td>
+                <td>{{ pred[5][:10] if pred[5] else 'N/A' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">No predictions yet</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('trendsChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                datasets: [{
+                    label: 'Predictions',
+                    data: [12, 19, 15, 17, 14, 22, 18],
+                    borderColor: '#e91e63',
+                    backgroundColor: 'rgba(233, 30, 99, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'High Risk',
+                    data: [3, 5, 4, 6, 3, 8, 5],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'top' } }
+            }
+        });
+    }
+</script>
+{% endblock %}

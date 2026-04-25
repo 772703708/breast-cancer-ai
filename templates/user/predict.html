@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}New Prediction | BreastCancerAI{% endblock %}
+
+{% block content %}
+<style>
+    .prediction-form {
+        background: var(--surface-light);
+        border-radius: 32px;
+        padding: 40px;
+        border: 1px solid var(--border-light);
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+    
+    .form-group {
+        margin-bottom: 8px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .form-group label i {
+        color: var(--primary-pink);
+        margin-right: 8px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 14px 16px;
+        background: var(--surface-alt-light);
+        border: 1px solid var(--border-light);
+        border-radius: 16px;
+        color: var(--text-light);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        border-color: var(--primary-pink);
+        box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+    }
+    
+    .form-group input::placeholder {
+        color: var(--text-muted-light);
+    }
+    
+    .full-width {
+        grid-column: span 2;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 32px;
+        justify-content: flex-end;
+    }
+    
+    .btn-reset {
+        background: var(--surface-alt-light);
+        border: 1px solid var(--border-light);
+        padding: 14px 32px;
+        border-radius: 50px;
+        color: var(--text-light);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-reset:hover {
+        background: var(--border-light);
+    }
+    
+    .info-note {
+        background: rgba(233, 30, 99, 0.05);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .full-width {
+            grid-column: span 1;
+        }
+        
+        .prediction-form {
+            padding: 24px;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .form-actions button,
+        .form-actions a {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div style="margin-bottom: 32px;">
+    <h1 style="font-size: 2rem;">Breast Cancer <span class="gradient-text">Risk Prediction</span></h1>
+    <p style="color: var(--text-secondary-light); margin-top: 8px;">Fill in the form below to get an instant risk assessment</p>
+</div>
+
+<div class="info-note">
+    <i class="fas fa-info-circle" style="font-size: 2rem; color: var(--primary-pink);"></i>
+    <div>
+        <strong>Important Note:</strong> This tool provides an AI-based risk assessment and is not a substitute for professional medical diagnosis. 
+        Always consult with a healthcare provider for medical advice.
+    </div>
+</div>
+
+<form class="prediction-form" id="predictionForm" method="POST" action="{{ url_for('predict_page') }}">
+    <div class="form-grid">
+        <!-- Age -->
+        <div class="form-group">
+            <label><i class="fas fa-calendar-alt"></i> Age (years)</label>
+            <input type="number" name="age" id="age" placeholder="Enter your age" min="18" max="120" required>
+        </div>
+        
+        <!-- BMI -->
+        <div class="form-group">
+            <label><i class="fas fa-weight-scale"></i> BMI</label>
+            <input type="number" name="bmi" id="bmi" placeholder="Enter your BMI" step="0.1" min="10" max="50" required>
+        </div>
+        
+        <!-- Menopause -->
+        <div class="form-group">
+            <label><i class="fas fa-female"></i> Menopause Status</label>
+            <select name="menopause" id="menopause" required>
+                <option value="">Select status</option>
+                <option value="premeno">Pre-menopause</option>
+                <option value="perimeno">Peri-menopause</option>
+                <option value="postmeno">Post-menopause</option>
+            </select>
+        </div>
+        
+        <!-- Tumor Size -->
+        <div class="form-group">
+            <label><i class="fas fa-circle"></i> Tumor Size (mm)</label>
+            <input type="number" name="tumor_size" id="tumor_size" placeholder="Enter tumor size in mm" min="0" max="100" required>
+        </div>
+        
+        <!-- Inv-Nodes -->
+        <div class="form-group">
+            <label><i class="fas fa-project-diagram"></i> Involved Nodes</label>
+            <input type="number" name="inv_nodes" id="inv_nodes" placeholder="Number of involved lymph nodes" min="0" max="50" value="0">
+        </div>
+        
+        <!-- Metastasis -->
+        <div class="form-group">
+            <label><i class="fas fa-arrow-right"></i> Metastasis</label>
+            <select name="metastasis" id="metastasis" required>
+                <option value="">Select status</option>
+                <option value="no">No Metastasis</option>
+                <option value="yes">Yes, Metastasis Present</option>
+            </select>
+        </div>
+        
+        <!-- History -->
+        <div class="form-group">
+            <label><i class="fas fa-history"></i> Medical History</label>
+            <select name="history" id="history" required>
+                <option value="">Select history</option>
+                <option value="no">No prior history</option>
+                <option value="yes">Yes, prior breast cancer history</option>
+            </select>
+        </div>
+        
+        <!-- Breast Side -->
+        <div class="form-group">
+            <label><i class="fas fa-venus"></i> Breast Side</label>
+            <select name="breast_side" id="breast_side" required>
+                <option value="">Select side</option>
+                <option value="left">Left Breast</option>
+                <option value="right">Right Breast</option>
+            </select>
+        </div>
+        
+        <!-- Breast Quadrant -->
+        <div class="form-group full-width">
+            <label><i class="fas fa-chart-pie"></i> Breast Quadrant</label>
+            <select name="breast_quadrant" id="breast_quadrant" required>
+                <option value="">Select quadrant</option>
+                <option value="left_up">Left Upper Quadrant</option>
+                <option value="left_low">Left Lower Quadrant</option>
+                <option value="right_up">Right Upper Quadrant</option>
+                <option value="right_low">Right Lower Quadrant</option>
+                <option value="central">Central</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="form-actions">
+        <button type="button" class="btn-reset" onclick="resetForm()">
+            <i class="fas fa-eraser"></i> Clear Form
+        </button>
+        <button type="submit" class="primary-btn">
+            <i class="fas fa-chart-line"></i> Predict Risk
+        </button>
+    </div>
+</form>
+
+<script>
+    function resetForm() {
+        document.getElementById('predictionForm').reset();
+    }
+    
+    // Form validation before submit
+    const form = document.getElementById('predictionForm');
+    form.addEventListener('submit', function(e) {
+        const age = document.getElementById('age').value;
+        const bmi = document.getElementById('bmi').value;
+        const tumorSize = document.getElementById('tumor_size').value;
+        
+        if (age < 18 || age > 120) {
+            e.preventDefault();
+            alert('Please enter a valid age between 18 and 120');
+            return false;
+        }
+        
+        if (bmi < 10 || bmi > 50) {
+            e.preventDefault();
+            alert('Please enter a valid BMI between 10 and 50');
+            return false;
+        }
+        
+        if (tumorSize < 0 || tumorSize > 100) {
+            e.preventDefault();
+            alert('Please enter a valid tumor size between 0 and 100 mm');
+            return false;
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        submitBtn.disabled = true;
+    });
+</script>
+{% endblock %}

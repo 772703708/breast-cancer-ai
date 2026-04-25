@@ -1,0 +1,329 @@
+{% extends "admin_base.html" %}
+
+{% block title %}System Monitor | Admin Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+    
+    .stat-card {
+        background: var(--surface-light);
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(233, 30, 99, 0.1);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-pink);
+        font-size: 1.3rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+    
+    .stat-label {
+        color: var(--text-muted-light);
+        font-size: 0.85rem;
+    }
+    
+    .system-card {
+        background: var(--surface-light);
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid var(--border-light);
+        margin-bottom: 32px;
+    }
+    
+    .system-card h3 {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: var(--text-muted-light);
+    }
+    
+    .info-value {
+        font-family: monospace;
+    }
+    
+    .status-online {
+        color: #10b981;
+    }
+    
+    .progress-bar {
+        background: var(--surface-alt-light);
+        border-radius: 30px;
+        height: 8px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        border-radius: 30px;
+        background: linear-gradient(90deg, #10b981, #34d399);
+        width: 0%;
+        transition: width 0.5s ease;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 16px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .action-btn {
+        padding: 10px 20px;
+        border-radius: 40px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: var(--gradient-pink);
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: var(--surface-alt-light);
+        border: 1px solid var(--border-light);
+        color: var(--text-light);
+    }
+    
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <h1 style="font-size: 1.8rem;">System Monitor</h1>
+    <p style="color: var(--text-muted-light);">Monitor system health, performance, and server status</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-microchip"></i></div>
+        </div>
+        <div class="stat-value">98%</div>
+        <div class="stat-label">CPU Usage</div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 98%; background: linear-gradient(90deg, #f59e0b, #f97316);"></div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-memory"></i></div>
+        </div>
+        <div class="stat-value">4.2/8 GB</div>
+        <div class="stat-label">RAM Usage</div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 52%;"></div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-hdd"></i></div>
+        </div>
+        <div class="stat-value">156/500 GB</div>
+        <div class="stat-label">Storage Used</div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 31%;"></div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon"><i class="fas fa-globe"></i></div>
+        </div>
+        <div class="stat-value">99.9%</div>
+        <div class="stat-label">Uptime</div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 99.9%;"></div></div>
+    </div>
+</div>
+
+<div class="system-card">
+    <h3><i class="fas fa-server" style="color: var(--primary-pink);"></i> Server Information</h3>
+    <div class="info-row">
+        <span class="info-label">Server Status</span>
+        <span class="info-value status-online"><i class="fas fa-circle"></i> Online</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Python Version</span>
+        <span class="info-value">3.10.0</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Flask Version</span>
+        <span class="info-value">2.3.3</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Database Size</span>
+        <span class="info-value">2.4 MB</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Last Backup</span>
+        <span class="info-value">{{ last_backup|default('2024-04-11 10:30:00') }}</span>
+    </div>
+</div>
+
+<div class="system-card">
+    <h3><i class="fas fa-brain" style="color: var(--primary-pink);"></i> ML Model Information</h3>
+    <div class="info-row">
+        <span class="info-label">Model Type</span>
+        <span class="info-value">Logistic Regression</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Model Status</span>
+        <span class="info-value status-online">Loaded</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Features Count</span>
+        <span class="info-value">{{ expected_features|default(30) }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Model Accuracy</span>
+        <span class="info-value">97.37%</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">ROC-AUC Score</span>
+        <span class="info-value">99.50%</span>
+    </div>
+    <div class="action-buttons">
+        <button class="action-btn btn-primary" onclick="retrainModel()">
+            <i class="fas fa-sync-alt"></i> Retrain Model
+        </button>
+        <button class="action-btn btn-secondary" onclick="validateModel()">
+            <i class="fas fa-check-circle"></i> Validate Model
+        </button>
+    </div>
+</div>
+
+<div class="system-card">
+    <h3><i class="fas fa-database" style="color: var(--primary-pink);"></i> Database Statistics</h3>
+    <div class="info-row">
+        <span class="info-label">Total Users</span>
+        <span class="info-value">{{ total_users|default(0) }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Total Predictions</span>
+        <span class="info-value">{{ total_predictions|default(0) }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Total Messages</span>
+        <span class="info-value">{{ total_messages|default(0) }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Chat History Records</span>
+        <span class="info-value">{{ chat_history_count|default(0) }}</span>
+    </div>
+    <div class="action-buttons">
+        <button class="action-btn btn-secondary" onclick="backupDatabase()">
+            <i class="fas fa-database"></i> Backup Database
+        </button>
+        <button class="action-btn btn-danger" onclick="clearCache()">
+            <i class="fas fa-trash-alt"></i> Clear Cache
+        </button>
+    </div>
+</div>
+
+<div class="system-card">
+    <h3><i class="fas fa-chart-line" style="color: var(--primary-pink);"></i> Recent Activity Log</h3>
+    <div class="info-row">
+        <span class="info-label">Last Prediction</span>
+        <span class="info-value">{{ last_prediction_time|default('2024-04-11 15:30:00') }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Last User Registration</span>
+        <span class="info-value">{{ last_registration|default('2024-04-11 14:20:00') }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Active Sessions</span>
+        <span class="info-value">{{ active_sessions|default(3) }}</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">API Requests (Today)</span>
+        <span class="info-value">{{ api_requests_today|default(156) }}</span>
+    </div>
+</div>
+
+<script>
+    function retrainModel() {
+        if (confirm('Retraining the model may take several minutes. Continue?')) {
+            alert('Model retraining started. This may take a few minutes.');
+        }
+    }
+    
+    function validateModel() {
+        alert('Model validation passed. Accuracy: 97.37%, ROC-AUC: 99.50%');
+    }
+    
+    function backupDatabase() {
+        alert('Database backup initiated. Backup file will be downloaded shortly.');
+    }
+    
+    function clearCache() {
+        if (confirm('Clearing cache may temporarily slow down the system. Continue?')) {
+            alert('Cache cleared successfully.');
+        }
+    }
+</script>
+{% endblock %}

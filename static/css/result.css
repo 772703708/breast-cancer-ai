@@ -1,0 +1,181 @@
+/* result.css */
+.result-card {
+    background: var(--surface-light);
+    border-radius: 32px;
+    padding: 48px;
+    text-align: center;
+    border: 1px solid var(--border-light);
+    margin-bottom: 32px;
+}
+
+.result-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 3rem;
+}
+
+.result-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.risk-description {
+    font-size: 1rem;
+    margin-bottom: 16px;
+    color: var(--text-secondary-light);
+}
+
+.probability-bar-container {
+    margin-top: 32px;
+}
+
+.probability-label {
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.probability-bar {
+    background: var(--surface-alt-light);
+    border-radius: 30px;
+    height: 32px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.probability-fill {
+    height: 100%;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 16px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: width 0.5s ease;
+}
+
+.probability-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 32px 0;
+}
+
+.info-item {
+    background: var(--surface-alt-light);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+}
+
+.info-item i {
+    font-size: 1.5rem;
+    color: var(--primary-pink);
+    margin-bottom: 12px;
+}
+
+.info-item .label {
+    font-size: 0.8rem;
+    color: var(--text-muted-light);
+    margin-bottom: 8px;
+}
+
+.info-item .value {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.recommendations {
+    background: rgba(233, 30, 99, 0.05);
+    border-radius: 24px;
+    padding: 28px;
+    margin-top: 24px;
+    text-align: left;
+}
+
+.recommendations h3 {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.recommendations ul {
+    list-style: none;
+    padding: 0;
+}
+
+.recommendations li {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.recommendations li:last-child {
+    border-bottom: none;
+}
+
+.recommendations li i {
+    color: var(--primary-pink);
+    width: 24px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
+}
+
+.risk-very-high { color: #dc2626; }
+.risk-high { color: #ef4444; }
+.risk-moderate-high { color: #f97316; }
+.risk-moderate { color: #f59e0b; }
+.risk-low-moderate { color: #84cc16; }
+.risk-low { color: #10b981; }
+.risk-very-low { color: #22c55e; }
+
+.bg-very-high { background: rgba(220, 38, 38, 0.15); }
+.bg-high { background: rgba(239, 68, 68, 0.15); }
+.bg-moderate-high { background: rgba(249, 115, 22, 0.15); }
+.bg-moderate { background: rgba(245, 158, 11, 0.15); }
+.bg-low-moderate { background: rgba(132, 204, 22, 0.15); }
+.bg-low { background: rgba(16, 185, 129, 0.15); }
+.bg-very-low { background: rgba(34, 197, 94, 0.15); }
+
+.fill-very-high { background: linear-gradient(90deg, #dc2626, #ef4444); }
+.fill-high { background: linear-gradient(90deg, #ef4444, #f87171); }
+.fill-moderate-high { background: linear-gradient(90deg, #f97316, #fb923c); }
+.fill-moderate { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.fill-low-moderate { background: linear-gradient(90deg, #84cc16, #a3e635); }
+.fill-low { background: linear-gradient(90deg, #10b981, #34d399); }
+.fill-very-low { background: linear-gradient(90deg, #22c55e, #4ade80); }
+
+@media (max-width: 768px) {
+    .result-card {
+        padding: 32px 24px;
+    }
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .result-title {
+        font-size: 1.5rem;
+    }
+}

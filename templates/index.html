@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Home | BreastCancerAI - Early Detection Saves Lives{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-text">
+        <span class="hero-badge">
+            <i class="fas fa-microscope"></i> AI-Powered Prediction
+        </span>
+        <h1>
+            Early Detection of<br>
+            <span class="gradient-text">Breast Cancer</span>
+        </h1>
+        <p>
+            Our machine learning system analyzes your health data to provide 
+            instant breast cancer risk assessment. Early awareness saves lives.
+            Powered by Logistic Regression with 95%+ accuracy.
+        </p>
+        
+        <div class="hero-buttons">
+            {% if session.user_id %}
+                <a href="{{ url_for('predict_page') }}" class="primary-btn">
+                    <i class="fas fa-chart-line"></i> Start Prediction
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="secondary-btn">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="primary-btn">
+                    <i class="fas fa-user-plus"></i> Get Started
+                </a>
+                <a href="{{ url_for('about') }}" class="secondary-btn">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </a>
+            {% endif %}
+        </div>
+        
+        <!-- <div class="hero-stats">
+            <div class="stat-item">
+                <div class="stat-number">95%+</div>
+                <div class="stat-label">Accuracy Rate</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">4,237+</div>
+                <div class="stat-label">Patient Records</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Availability</div>
+            </div> -->
+        </div>
+    </div>
+    
+    <div class="hero-visual">
+        <div class="hero-card floating">
+            <i class="fas fa-ribbon"></i>
+            <h3>Logistic Regression Model</h3>
+            <p>Binary classification with 95%+ ROC-AUC score</p>
+            <p style="margin-top: 12px;"><strong>Benign ↔ Malignant</strong></p>
+            <div style="margin-top: 20px;">
+                <span style="display: inline-block; width: 12px; height: 12px; background: #10b981; border-radius: 50%;"></span>
+                <span style="margin: 0 8px;">Benign (0)</span>
+                <span style="display: inline-block; width: 12px; height: 12px; background: #ef4444; border-radius: 50%;"></span>
+                <span>Malignant (1)</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Grid -->
+<section class="stats-grid">
+    <div class="stat-card">
+        <h2>98.8%</h2>
+        <p>ROC-AUC Score</p>
+    </div>
+    <div class="stat-card">
+        <h2>4,237</h2>
+        <p>Training Samples</p>
+    </div>
+    <div class="stat-card">
+        <h2>14</h2>
+        <p>Features Analyzed</p>
+    </div>
+    <div class="stat-card">
+        <h2>Instant</h2>
+        <p>Real-time Results</p>
+    </div>
+</section>
+
+<!-- Random Tips Banner -->
+<div class="info-card-banner" id="randomTipBanner">
+    <div class="info-card-content">
+        <i class="fas fa-lightbulb"></i>
+        <div>
+            <h3 id="tipTitle">Did You Know?</h3>
+            <p id="tipText">Early detection through regular screening can increase survival rates to over 90%.</p>
+        </div>
+    </div>
+    <button class="refresh-tip-btn" onclick="refreshTip()">
+        <i class="fas fa-sync-alt"></i> New Tip
+    </button>
+</div>
+
+<!-- Video Section -->
+<section class="video-section">
+    <div class="video-container">
+        <div class="video-wrapper">
+            <iframe id="youtubeVideo"
+                src="https://www.youtube.com/embed/hk6PWJe486k?enablejsapi=1"
+                title="Breast Cancer Awareness and Early Detection"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="video-content">
+            <h2>
+                <i class="fas fa-play-circle"></i> 
+                Understanding Breast Cancer Risk
+            </h2>
+            <p>
+                Watch this informative video to understand the importance of early detection, 
+                risk factors, and how our AI prediction system can help you make informed 
+                decisions about your health. Regular screening and awareness are key to 
+                preventing advanced-stage breast cancer.
+            </p>
+            <div class="video-controls">
+                <button class="video-btn" id="playVideo">
+                    <i class="fas fa-play"></i> Play
+                </button>
+                <button class="video-btn" id="pauseVideo">
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button class="video-btn" id="restartVideo">
+                    <i class="fas fa-redo-alt"></i> Restart
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="section-header">
+        <span class="section-badge">Why Choose Us</span>
+        <h2>Intelligent Features for <span class="gradient-text">Better Health</span></h2>
+        <p>Our system combines cutting-edge machine learning with user-friendly design</p>
+    </div>
+    
+    <div class="cards-grid">
+        <div class="feature-card">
+            <div class="card-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3>ML-Powered Predictions</h3>
+            <p>Logistic Regression algorithm trained on 4,237 patient records for accurate binary classification (Benign/Malignant).</p>
+            <div class="card-badge">95%+ Accuracy</div>
+        </div>
+        
+        <div class="feature-card">
+            <div class="card-icon">
+                <i class="fas fa-chart-simple"></i>
+            </div>
+            <h3>Instant Risk Assessment</h3>
+            <p>Enter basic health data (Age, BMI, Tumor Size, Metastasis) and receive immediate probability results.</p>
+            <div class="card-badge">Real-time</div>
+        </div>
+        
+        <div class="feature-card">
+            <div class="card-icon">
+                <i class="fas fa-laptop-medical"></i>
+            </div>
+            <h3>User-Friendly Interface</h3>
+            <p>Clean, intuitive design accessible on all devices. Track your health history and compare past predictions.</p>
+            <div class="card-badge">24/7 Access</div>
+        </div>
+        
+        <div class="feature-card">
+            <div class="card-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Secure & Private</h3>
+            <p>Your medical data is encrypted and protected. We comply with healthcare data protection standards.</p>
+            <div class="card-badge">GDPR Compliant</div>
+        </div>
+        
+        <div class="feature-card">
+            <div class="card-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3>Track Health History</h3>
+            <p>Monitor your health trends over time with our comprehensive history tracking feature.</p>
+            <div class="card-badge">Long-term</div>
+        </div>
+        
+        <div class="feature-card">
+            <div class="card-icon">
+                <i class="fas fa-chalkboard-user"></i>
+            </div>
+            <h3>Personalized Feedback</h3>
+            <p>Receive customized health recommendations based on your prediction results.</p>
+            <div class="card-badge">Tailored</div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Random tips for the info card
+const tips = [
+    { title: "Did You Know?", text: "Early detection through regular screening can increase survival rates to over 90%." },
+    { title: "Health Fact", text: "Women over 40 should have a mammogram every 1-2 years for early detection." },
+    { title: "Prevention Tip", text: "Regular exercise and maintaining a healthy BMI can reduce breast cancer risk." },
+    { title: "Awareness", text: "Self-examination once a month helps detect unusual changes early." },
+    { title: "Did You Know?", text: "Our AI model achieved 95%+ accuracy in predicting breast cancer risk." },
+    { title: "Health Tip", text: "Limit alcohol consumption - even one drink per day increases risk by 10%." },
+    { title: "Research Fact", text: "About 1 in 8 women in the US will develop invasive breast cancer in their lifetime." },
+    { title: "Prevention", text: "Breastfeeding can lower breast cancer risk, especially if continued for 1-2 years." }
+];
+
+function refreshTip() {
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    document.getElementById('tipTitle').textContent = randomTip.title;
+    document.getElementById('tipText').textContent = randomTip.text;
+}
+
+// Video Controls
+document.addEventListener('DOMContentLoaded', function() {
+    const videoIframe = document.getElementById('youtubeVideo');
+    const playBtn = document.getElementById('playVideo');
+    const pauseBtn = document.getElementById('pauseVideo');
+    const restartBtn = document.getElementById('restartVideo');
+    
+    if (playBtn) {
+        playBtn.addEventListener('click', () => {
+            videoIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        });
+    }
+    
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', () => {
+            videoIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        });
+    }
+    
+    if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+            videoIframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[0, true]}', '*');
+        });
+    }
+});
+</script>
+{% endblock %}

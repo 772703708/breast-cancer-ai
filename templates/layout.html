@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BreastCancerAI - Early Detection Saves Lives{% endblock %}</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-pink: #e91e63;
+            --primary-dark: #c2185b;
+            --primary-light: #f48fb1;
+            --sidebar-bg: #1a1a2e;
+            --sidebar-hover: #16213e;
+            --content-bg: #f8f9fa;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+        
+        [data-theme="dark"] {
+            --sidebar-bg: #0f0f1a;
+            --sidebar-hover: #1a1a2e;
+            --content-bg: #121212;
+            --text-dark: #ffffff;
+            --text-muted: #9ca3af;
+            --border-color: #2d2d2d;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--content-bg);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+        
+        /* App Container */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: var(--text-light);
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar-logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        
+        .sidebar-logo-text h2 {
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+        
+        .sidebar-logo-text p {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 24px 16px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item i {
+            width: 24px;
+            font-size: 1.1rem;
+        }
+        
+        .nav-item:hover,
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            color: white;
+        }
+        
+        .nav-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 16px;
+        }
+        
+        .user-info {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .user-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        
+        .user-details p {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+        
+        .logout-btn {
+            color: #ef4444;
+        }
+        
+        .logout-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        /* Top Header */
+        .top-header {
+            background: var(--content-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+        
+        .page-title h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .page-title p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .share-btn {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+        
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            color: var(--text-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            margin-bottom: 16px;
+        }
+        
+        .back-btn:hover {
+            background: var(--border-color);
+        }
+        
+        .content-area {
+            padding: 32px;
+            min-height: calc(100vh - 80px);
+        }
+        
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .chat-toggle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .chat-toggle:hover {
+            transform: scale(1.05);
+        }
+        
+        .chat-toggle i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: var(--content-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            z-index: 1001;
+        }
+        
+        .chat-window.open {
+            display: flex;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            padding: 16px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h3 {
+            font-size: 1rem;
+            margin: 0;
+        }
+        
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .message.user {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.bot {
+            background: var(--border-color);
+            color: var(--text-dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            background: var(--content-bg);
+            color: var(--text-dark);
+            outline: none;
+        }
+        
+        .chat-input-area button {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-dark));
+            border: none;
+            padding: 10px 16px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* Flash Messages */
+        .flash-message {
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .flash-success { background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success); color: var(--success); }
+        .flash-danger { background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); color: var(--danger); }
+        .flash-warning { background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--warning); color: var(--warning); }
+        .flash-info { background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--info); color: var(--info); }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Share Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--content-bg);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .share-link {
+            display: flex;
+            margin: 20px 0;
+            gap: 12px;
+        }
+        
+        .share-link input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--content-bg);
+            color: var(--text-dark);
+        }
+        
+        .copy-btn {
+            background: var(--primary-pink);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-toggle {
+                display: flex;
+            }
+            .chat-window {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+                height: 450px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-ribbon"></i>
+                </div>
+                <div class="sidebar-logo-text">
+                    <h2>BreastCancerAI</h2>
+                    <p>Early Detection Saves Lives</p>
+                </div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fas fa-home"></i> <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('about') }}" class="nav-item {% if request.endpoint == 'about' %}active{% endif %}">
+                    <i class="fas fa-clipboard-list"></i> <span>Project Justification</span>
+                </a>
+                <a href="{{ url_for('contact') }}" class="nav-item {% if request.endpoint == 'contact' %}active{% endif %}">
+                    <i class="fas fa-envelope"></i> <span>Contact Us</span>
+                </a>
+                
+                {% if session.is_authenticated %}
+                <div class="nav-divider"></div>
+                <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i> <span>My Dashboard</span>
+                </a>
+                <a href="{{ url_for('predict_page') }}" class="nav-item {% if request.endpoint == 'predict_page' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i> <span>New Prediction</span>
+                </a>
+                <a href="{{ url_for('history') }}" class="nav-item {% if request.endpoint == 'history' %}active{% endif %}">
+                    <i class="fas fa-history"></i> <span>History</span>
+                </a>
+                {% endif %}
+            </div>
+            
+            {% if session.is_authenticated %}
+            <div class="user-info">
+                <div class="user-avatar">
+                    {{ session.username[0]|upper if session.username else 'U' }}
+                </div>
+                <div class="user-details">
+                    <h4>{{ session.username }}</h4>
+                    <p>{{ session.email }}</p>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <a href="{{ url_for('logout') }}" class="nav-item logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </div>
+            {% else %}
+            <div class="sidebar-nav">
+                <a href="{{ url_for('login') }}" class="nav-item">
+                    <i class="fas fa-sign-in-alt"></i> <span>Sign In</span>
+                </a>
+            </div>
+            {% endif %}
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-header">
+                <div class="page-title">
+                    <h1>{% block page_title %}BreastCancerAI{% endblock %}</h1>
+                    <p>{% block page_subtitle %}AI-Powered Breast Cancer Risk Prediction{% endblock %}</p>
+                </div>
+                <div class="header-actions">
+                    <button class="share-btn" onclick="openShareModal()">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            {% if request.endpoint not in ['index', 'login'] %}
+            <div style="padding: 0 32px;">
+                <a href="javascript:history.back()" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Go Back
+                </a>
+            </div>
+            {% endif %}
+            
+            <!-- Flash Messages -->
+            <div style="padding: 0 32px;">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            
+            <div class="content-area">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    
+    <!-- Mobile Toggle -->
+    <div class="mobile-toggle" id="mobileToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <div class="chat-toggle" id="chatToggle">
+            <i class="fas fa-comment-medical"></i>
+        </div>
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <h3><i class="fas fa-robot"></i> AI Health Assistant</h3>
+                <button class="chat-close" id="chatClose"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    👋 Hello! I'm your Breast Cancer AI Assistant. Ask me anything about:<br>
+                    • Symptoms & risk factors<br>
+                    • Prevention & screening<br>
+                    • Our prediction model<br>
+                    • General breast health
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Type your question...">
+                <button id="chatSend"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <i class="fas fa-share-alt" style="font-size: 2rem; color: var(--primary-pink); margin-bottom: 16px;"></i>
+            <h3>Share This Application</h3>
+            <p>Share this link with others to help them access breast cancer risk prediction</p>
+            <div class="share-link">
+                <input type="text" id="shareUrl" readonly value="{{ request.host_url }}">
+                <button class="copy-btn" onclick="copyShareLink()">Copy</button>
+            </div>
+            <button onclick="closeShareModal()" style="margin-top: 16px; background: none; border: none; color: var(--text-muted); cursor: pointer;">Close</button>
+        </div>
+    </div>
+    
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+        
+        // Mobile Sidebar
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('mobile-open');
+            });
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (sidebar && !sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            }
+        });
+        
+        // Share Modal
+        function openShareModal() {
+            document.getElementById('shareModal').style.display = 'flex';
+        }
+        
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
+        }
+        
+        function copyShareLink() {
+            const input = document.getElementById('shareUrl');
+            input.select();
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+        }
+        
+        // Chat Widget
+        const chatToggle = document.getElementById('chatToggle');
+        const chatWindow = document.getElementById('chatWindow');
+        const chatClose = document.getElementById('chatClose');
+        const chatInput = document.getElementById('chatInput');
+        const chatSend = document.getElementById('chatSend');
+        const chatMessages = document.getElementById('chatMessages');
+        
+        if (chatToggle) {
+            chatToggle.addEventListener('click', () => {
+                chatWindow.classList.toggle('open');
+            });
+        }
+        
+        if (chatClose) {
+            chatClose.addEventListener('click', () => {
+                chatWindow.classList.remove('open');
+            });
+        }
+        
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            chatMessages.innerHTML += `<div class="message user">${escapeHtml(message)}</div>`;
+            chatInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Show typing indicator
+            chatMessages.innerHTML += `<div class="message bot" id="typing"><i class="fas fa-spinner fa-spin"></i> Thinking...</div>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                
+                // Remove typing indicator
+                document.getElementById('typing')?.remove();
+                
+                // Add bot response
+                chatMessages.innerHTML += `<div class="message bot">${escapeHtml(data.response)}</div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } catch (error) {
+                document.getElementById('typing')?.remove();
+                chatMessages.innerHTML += `<div class="message bot">Sorry, I'm having trouble responding. Please try again.</div>`;
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        if (chatSend) {
+            chatSend.addEventListener('click', sendMessage);
+        }
+        
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+        
+        // Auto hide flash messages
+        setTimeout(() => {
+            document.querySelectorAll('.flash-message').forEach(msg => {
+                msg.style.transition = 'opacity 0.5s';
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 500);
+            });
+        }, 4000);
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
