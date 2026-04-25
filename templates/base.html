@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e91e63">
     <title>{% block title %}BreastCancerAI - Early Detection Saves Lives{% endblock %}</title>
 
     <!-- Font Awesome -->
@@ -21,7 +22,26 @@
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e91e63'%3E%3Cpath d='M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Z'/%3E%3Cpath d='M12 6a4 4 0 1 0 4 4 4 4 0 0 0-4-4Zm0 6a2 2 0 1 1 2-2 2 2 0 0 1-2 2Z'/%3E%3C/svg%3E">
 
     {% block extra_css %}{% endblock %}
+    
     <style>
+        /* ============================================ */
+        /* RESPONSIVE STYLES - Mobile First Approach */
+        /* ============================================ */
+        
+        :root {
+            --container-padding: 20px;
+            --header-height: 70px;
+            --header-height-mobile: 60px;
+        }
+
+        /* General Responsive Container */
+        .header-container, .footer-container, .main-content > div {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--container-padding);
+        }
+
+        /* Flash Messages Responsive */
         .flash-message {
             background: var(--surface-light);
             padding: 12px 20px;
@@ -30,23 +50,13 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 14px;
         }
 
-        .flash-success {
-            border-left: 4px solid #10b981;
-        }
-
-        .flash-danger {
-            border-left: 4px solid #ef4444;
-        }
-
-        .flash-warning {
-            border-left: 4px solid #f59e0b;
-        }
-
-        .flash-info {
-            border-left: 4px solid #3b82f6;
-        }
+        .flash-success { border-left: 4px solid #10b981; }
+        .flash-danger { border-left: 4px solid #ef4444; }
+        .flash-warning { border-left: 4px solid #f59e0b; }
+        .flash-info { border-left: 4px solid #3b82f6; }
 
         /* User Dropdown Styles */
         .user-menu {
@@ -163,22 +173,130 @@
             color: white;
         }
 
-        /* Responsive */
+        /* ============================================ */
+        /* RESPONSIVE BREAKPOINTS */
+        /* ============================================ */
+
+        /* Large Desktop (1200px and up) */
+        @media (min-width: 1200px) {
+            :root {
+                --container-padding: 40px;
+            }
+        }
+
+        /* Tablet (768px - 1199px) */
+        @media (min-width: 769px) and (max-width: 1199px) {
+            :root {
+                --container-padding: 30px;
+            }
+            
+            .brand-title {
+                font-size: 1.3rem;
+            }
+            
+            .brand-sub {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Mobile Large (426px - 768px) */
         @media (max-width: 768px) {
+            :root {
+                --container-padding: 15px;
+            }
+            
+            /* User Menu Mobile */
             .user-menu-btn span {
                 display: none;
             }
-
             .user-menu-btn {
                 padding: 8px 12px;
             }
-
+            
+            /* Login Button Mobile */
             .login-btn span {
                 display: none;
             }
-
             .login-btn {
                 padding: 8px 12px;
+            }
+            
+            /* Flash Messages Mobile */
+            .flash-message {
+                font-size: 12px;
+                padding: 10px 15px;
+            }
+            
+            /* Dropdown Mobile */
+            .user-dropdown {
+                position: fixed;
+                top: auto;
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                width: auto;
+                min-width: auto;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+        }
+
+        /* Mobile Small (up to 425px) */
+        @media (max-width: 425px) {
+            :root {
+                --container-padding: 12px;
+            }
+            
+            .brand-title {
+                font-size: 1rem;
+            }
+            
+            .brand-sub {
+                font-size: 0.6rem;
+                display: none; /* Hide on very small screens */
+            }
+            
+            .logo-circle {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Landscape Mode for Mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .main-header {
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            
+            .mobile-menu {
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .user-menu-btn, 
+            .login-btn, 
+            .header-icon-btn,
+            .mobile-menu-btn {
+                min-height: 44px; /* Better touch targets */
+            }
+            
+            .user-dropdown a {
+                padding: 14px 16px; /* Larger touch area */
+            }
+        }
+
+        /* High Resolution Screens */
+        @media (min-width: 1920px) {
+            .header-container, 
+            .footer-container, 
+            .main-content > div {
+                max-width: 1600px;
             }
         }
     </style>
@@ -202,13 +320,13 @@
                 <ul>
                     <li><a href="{{ url_for('index') }}"
                             class="{% if request.endpoint == 'index' %}active{% endif %}"><i class="fas fa-home"></i>
-                            Home</a></li>
+                            <span>Home</span></a></li>
                     <li><a href="{{ url_for('about') }}"
                             class="{% if request.endpoint == 'about' %}active{% endif %}"><i
-                                class="fas fa-clipboard-list"></i> About </a></li>
+                                class="fas fa-clipboard-list"></i> <span>About</span></a></li>
                     <li><a href="{{ url_for('contact') }}"
                             class="{% if request.endpoint == 'contact' %}active{% endif %}"><i
-                                class="fas fa-envelope"></i> Contact</a></li>
+                                class="fas fa-envelope"></i> <span>Contact</span></a></li>
                 </ul>
             </nav>
 
@@ -260,8 +378,14 @@
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>Menu</h3>
+            <button class="close-mobile-menu" id="closeMobileMenu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
         <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a>
-        <a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> About </a>
+        <a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> About</a>
         <a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a>
         {% if not session.user_id %}
         <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Sign In</a>
@@ -276,12 +400,11 @@
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-    <div style="max-width: 1400px; margin: 20px auto 0; padding: 0 40px;">
+    <div class="flash-messages-container">
         {% for category, message in messages %}
         <div class="flash-message flash-{{ category }}">
-            <i
-                class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
-            {{ message }}
+            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            <span>{{ message }}</span>
         </div>
         {% endfor %}
     </div>
@@ -321,7 +444,7 @@
                 <h3>Quick Links</h3>
                 <ul>
                     <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> About </a></li>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-clipboard-list"></i> About</a></li>
                     <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
                     {% if session.user_id %}
                     <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -354,6 +477,17 @@
 
             const savedTheme = localStorage.getItem('theme') || 'light';
             htmlElement.setAttribute('data-theme', savedTheme);
+            
+            // Update theme icon
+            function updateThemeIcon(theme) {
+                if (themeToggle) {
+                    const icon = themeToggle.querySelector('i');
+                    if (icon) {
+                        icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+                    }
+                }
+            }
+            updateThemeIcon(savedTheme);
 
             if (themeToggle) {
                 themeToggle.addEventListener('click', function () {
@@ -361,69 +495,73 @@
                     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                     htmlElement.setAttribute('data-theme', newTheme);
                     localStorage.setItem('theme', newTheme);
+                    updateThemeIcon(newTheme);
                 });
             }
 
             // Mobile Menu
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const mobileMenu = document.getElementById('mobileMenu');
+            const closeMobileMenu = document.getElementById('closeMobileMenu');
 
             if (mobileMenuBtn && mobileMenu) {
                 mobileMenuBtn.addEventListener('click', function () {
                     mobileMenu.classList.toggle('active');
+                    document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
                 });
+
+                if (closeMobileMenu) {
+                    closeMobileMenu.addEventListener('click', function () {
+                        mobileMenu.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                }
 
                 const mobileLinks = mobileMenu.querySelectorAll('a');
                 mobileLinks.forEach(function (link) {
                     link.addEventListener('click', function () {
                         mobileMenu.classList.remove('active');
+                        document.body.style.overflow = '';
                     });
+                });
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (mobileMenu.classList.contains('active')) {
+                        if (!mobileMenuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                            mobileMenu.classList.remove('active');
+                            document.body.style.overflow = '';
+                        }
+                    }
                 });
             }
 
-            // User Dropdown - Fixed version
+            // User Dropdown
             const userMenuBtn = document.getElementById('userMenuBtn');
             const userDropdown = document.getElementById('userDropdown');
 
             if (userMenuBtn && userDropdown) {
-                console.log('User menu elements found, adding event listeners');
+                console.log('User menu elements found');
 
-                // Remove any existing event listeners by cloning and replacing
-                var newUserMenuBtn = userMenuBtn.cloneNode(true);
-                userMenuBtn.parentNode.replaceChild(newUserMenuBtn, userMenuBtn);
-
-                var newUserDropdown = userDropdown.cloneNode(true);
-                userDropdown.parentNode.replaceChild(newUserDropdown, userDropdown);
-
-                // Get the new references
-                const finalUserBtn = document.getElementById('userMenuBtn');
-                const finalUserDropdown = document.getElementById('userDropdown');
-
-                // Add click event to button
-                finalUserBtn.addEventListener('click', function (e) {
+                userMenuBtn.addEventListener('click', function (e) {
                     e.stopPropagation();
                     e.preventDefault();
-
-                    if (finalUserDropdown.classList.contains('show')) {
-                        finalUserDropdown.classList.remove('show');
-                    } else {
-                        finalUserDropdown.classList.add('show');
-                    }
+                    userDropdown.classList.toggle('show');
                 });
 
-                // Close dropdown when clicking outside
                 document.addEventListener('click', function (e) {
-                    if (finalUserBtn && !finalUserBtn.contains(e.target)) {
-                        finalUserDropdown.classList.remove('show');
+                    if (userDropdown.classList.contains('show')) {
+                        if (!userMenuBtn.contains(e.target)) {
+                            userDropdown.classList.remove('show');
+                        }
                     }
                 });
 
-                // Prevent dropdown from closing when clicking inside
-                finalUserDropdown.addEventListener('click', function (e) {
+                userDropdown.addEventListener('click', function (e) {
                     e.stopPropagation();
                 });
             } else {
-                console.log('User menu elements NOT found');
+                console.log('User menu elements NOT found on this page');
             }
 
             // Auto hide flash messages after 4 seconds
